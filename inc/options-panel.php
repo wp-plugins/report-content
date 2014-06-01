@@ -214,7 +214,7 @@ function wprc_create_options() {
         'author_email_content', '', 'wprc_render_settings_field', 'wprc_settings', 'email_settings_section',
 		array(
 			'title' => 'Author Email Content',
-			'desc' => 'This will be sent to the author of the post. The report will also be appended.',
+			'desc' => 'This will be sent to the author of the post. The report will also be appended.<br/><b>%AUTHOR%</b> will be replaced by author name<br/><b>%POSTURL%</b> will be replaced with a link to the post<br/><b>%EDITURL%</b> will be replaced with a link to the edit page',
 			'id' => 'author_email_content',
 			'type' => 'textarea',
 			'group' => 'wprc_email_settings'
@@ -236,7 +236,7 @@ function wprc_create_options() {
         'admin_email_content', '', 'wprc_render_settings_field', 'wprc_settings', 'email_settings_section',
 		array(
 			'title' => 'Admin Email Content',
-			'desc' => 'This will be sent to the blog admins. The report will also be appended.',
+			'desc' => 'This will be sent to the blog admins. The report will also be appended.<br/><b>%POSTURL%</b> will be replaced with a link to the post<br/><b>%EDITURL%</b> will be replaced with a link to the edit page<br/><b>%REPORTSURL%</b> will be replaced by a link to reports page',
 			'id' => 'admin_email_content',
 			'type' => 'textarea',
 			'group' => 'wprc_email_settings'

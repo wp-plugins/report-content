@@ -41,6 +41,10 @@
 	width:80%;
 }
 
+.col textarea{
+	height:170px;
+}
+
 .paddingtop20{
 	padding-top:20px;
 }

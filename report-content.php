@@ -3,7 +3,7 @@
 Plugin Name: Report Content
 Plugin URI: http://wpgurus.net/
 Description: Inserts a secure form on specified pages so that your readers can report bugs, spam content and other problems.
-Version: 1.0
+Version: 1.1
 Author: Hassan Akhtar
 Author URI: http://wpgurus.net/
 License: GPL2
@@ -51,16 +51,17 @@ function wprc_install() {
 	);
 	$wprc_integration_settings = array(
 		'integration_type'			=> 'automatically',
-		'automatic_form_position' 	=> 'above'
+		'automatic_form_position' 	=> 'above',
+		'display_on' 				=> 'posts_pages'
 	);
 	$wprc_email_settings = array(
 		'email_recipients' 		=> 'none',
 		'sender_name' 			=> '',
 		'sender_address' 		=> '',
 		'author_email_subject' 	=> 'Your article has been flagged',
-		'author_email_content' 	=> 'Your article on '.get_option('blogname').' has been flagged',
+		'author_email_content' 	=> "Hi %AUTHOR%,\n\nYour article on ".get_option('blogname')." has been flagged.\n\nView the article: %POSTURL%\nEdit the article: %EDITURL%",
 		'admin_email_subject'	=> 'New report submitted',
-		'admin_email_content'	=> 'An article on your website '.get_option('blogname').' has been flagged'
+		'admin_email_content'	=> "Hi admin,\n\nAn article on your website ".get_option('blogname')." has been flagged.\n\nView the article: %POSTURL%\nEdit the article: %EDITURL%\nView all reports: %REPORTSURL%"
 	);
 	$wprc_permissions_settings = array(
 		'minimum_role_view' 	=> 'install_plugins',
@@ -174,25 +175,35 @@ function wprc_get_post_reports($post_id){
 ***********************************************/
 
 function wprc_mail($report){
-	$post_id = $report['post_id'];
-	$email_options = get_option('wprc_email_settings');
-	$admin_emails_sent = true;
+	$post_id 			= $report['post_id'];
+	$post_url 			= get_post_permalink( $post_id );
+	$post_edit_url 		= admin_url( "post.php?post=$post_id&action=edit" );
+	$reports_url 		= admin_url( 'admin.php?page=wprc_reports_page' );
+	$email_options 		= get_option('wprc_email_settings');
+	$admin_emails_sent 	= true;
 	$author_emails_sent = true;
+	$headers 			= array();
 	if( !$email_options || $email_options['email_recipients'] == 'none')
 		return true;
 
-	if($email_options['sender_name'] && $email_options['sender_email'])
-		$headers[] = 'From: '.$email_options['sender_name'].' <'.$email_options['sender_email'].'>';
+	if($email_options['sender_name'] && $email_options['sender_address'])
+		$headers[] = 'From: '.$email_options['sender_name'].' <'.$email_options['sender_address'].'>';
 	$report_string = "\n\nReport:\n\n".$report['reason']."\n\n".$report['details'];
 
 	if('admin' == $email_options['email_recipients'] || 'author_admin' == $email_options['email_recipients']){
 		$to_admin = get_option( 'admin_email' );
+		$email_options['admin_email_content'] = str_replace('%POSTURL%', $post_url, $email_options['admin_email_content']);
+		$email_options['admin_email_content'] = str_replace('%EDITURL%', $post_edit_url, $email_options['admin_email_content']);
+		$email_options['admin_email_content'] = str_replace('%REPORTSURL%', $reports_url, $email_options['admin_email_content']);
 		$admin_emails_sent = wp_mail( $to_admin, $email_options['admin_email_subject'], $email_options['admin_email_content'].$report_string, $headers );
 	}
 
 	if('author' == $email_options['email_recipients'] || 'author_admin' == $email_options['email_recipients']){
 		$post = get_post($post_id);
 		$author = get_user_by( 'id', $post->post_author );
+		$email_options['author_email_content'] = str_replace('%AUTHOR%', $author->display_name, $email_options['author_email_content']);
+		$email_options['author_email_content'] = str_replace('%POSTURL%', $post_url, $email_options['author_email_content']);
+		$email_options['author_email_content'] = str_replace('%EDITURL%', $post_edit_url, $email_options['author_email_content']);
 		if($author->user_email != $to_admin)
 			$author_emails_sent = wp_mail( $author->user_email, $email_options['author_email_subject'], $email_options['author_email_content'].$report_string, $headers );
 	}
@@ -229,13 +240,17 @@ function wprc_add_report(){
 		die(json_encode($message));
 	}
 
+	$details  		= $_POST['details'];
+	$reporter_name 	= (isset($_POST['reporter_name']))?$_POST['reporter_name']:'';
+	$reporter_email = (isset($_POST['reporter_email']))?$_POST['reporter_email']:'';
+
 	$new_report = array(
 		'reason' 			=> 	sanitize_text_field($_POST['reason']),
 		'status'			=>	'new',
 		'time'				=>	current_time('mysql'),
-		'details'			=>	sanitize_text_field($_POST['details']),
-		'reporter_name'		=>	sanitize_text_field($_POST['reporter_name']),
-		'reporter_email'	=>	sanitize_email($_POST['reporter_email']),
+		'details'			=>	sanitize_text_field($details),
+		'reporter_name'		=>	sanitize_text_field($reporter_name),
+		'reporter_email'	=>	sanitize_email($reporter_email),
 		'post_id'			=>	intval($_POST['id'])
 	);
 	if(wprc_is_spam($new_report)){
