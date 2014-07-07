@@ -3,7 +3,7 @@
 Plugin Name: Report Content
 Plugin URI: http://wpgurus.net/
 Description: Inserts a secure form on specified pages so that your readers can report bugs, spam content and other problems.
-Version: 1.1
+Version: 1.12
 Author: Hassan Akhtar
 Author URI: http://wpgurus.net/
 License: GPL2
@@ -279,7 +279,7 @@ add_action( 'wp_ajax_nopriv_wprc_add_report', 'wprc_add_report' );
 
 function wprc_add_admin_column_headers($headers){
 	$permission_options = get_option('wprc_permissions_settings');
-	if(!current_user_can($permission_options['minimum_role_view'])) return;
+	if(!current_user_can($permission_options['minimum_role_view'])) return $headers;
 
 	$headers['wprc_post_reports'] = "Post Reports";
 	return $headers;
