@@ -3,8 +3,8 @@ Contributors: khaxan
 Tags: report content, report posts, broken links, website errors, error reporting, notify, notification, email notifications, email, spam content
 Donate link: http://wpgurus.net/
 Requires at least: 3.0
-Tested up to: 3.9.1
-Stable tag: 1.12
+Tested up to: 4.0
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

@@ -29,7 +29,11 @@ class WPRC_Table extends WP_List_Table {
     }
     function column_post($item){
         $post = get_post($item['post_id']);
-        return '<a href="'.get_edit_post_link( $post->ID ).'#wprc-reports">'.$post->post_title.'</a>';
+        
+        if( is_a($post, 'WP_Post') )
+            return '<a href="'.get_edit_post_link( $post->ID ).'#wprc-reports">'.$post->post_title.'</a>';
+
+        return 'Post Not Found';
     }
 
     function column_status($item){

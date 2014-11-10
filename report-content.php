@@ -3,7 +3,7 @@
 Plugin Name: Report Content
 Plugin URI: http://wpgurus.net/
 Description: Inserts a secure form on specified pages so that your readers can report bugs, spam content and other problems.
-Version: 1.12
+Version: 1.2
 Author: Hassan Akhtar
 Author URI: http://wpgurus.net/
 License: GPL2
@@ -167,6 +167,24 @@ function wprc_get_post_reports($post_id){
     $query = "SELECT * FROM $table WHERE post_id = $post_id ORDER BY time DESC";
     return $wpdb->get_results( $query, ARRAY_A );
 }
+
+function wprc_delete_post_reports($post_id){
+	global $wpdb;
+	$table = $wpdb->prefix . "contentreports";
+    $query = $wpdb->prepare( "DELETE FROM $table WHERE post_id = %d", $post_id );
+    return $wpdb->query( $query );
+}
+
+/**********************************************
+*
+* Cleanup on post deletion
+*
+***********************************************/
+
+function wprc_on_post_delete($post_id){
+	wprc_delete_post_reports($post_id);
+}
+add_action('delete_post', 'wprc_on_post_delete');
 
 /**********************************************
 *

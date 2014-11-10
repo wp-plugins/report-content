@@ -45,7 +45,8 @@ function wprc_render_settings_page() {
 		</div>
 		<div class="last threecol">
 			<div class="side-block">
-				Need Help?
+				Like the plugin? <br/>
+				<a href="https://wordpress.org/support/view/plugin-reviews/report-content#postform">Leave a review</a>.
 			</div>
 		</div>
 	</div>
