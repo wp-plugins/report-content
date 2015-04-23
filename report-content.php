@@ -3,7 +3,7 @@
 Plugin Name: Report Content
 Plugin URI: http://wpgurus.net/
 Description: Inserts a secure form on specified pages so that your readers can report bugs, spam content and other problems.
-Version: 1.2
+Version: 1.3
 Author: Hassan Akhtar
 Author URI: http://wpgurus.net/
 License: GPL2
